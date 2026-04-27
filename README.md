@@ -28,7 +28,7 @@ Ce projet documente la conception et la mise en œuvre de leur nouvelle infrastr
 
 ### Schéma réseau global (Genève / Paris / Cloud AWS)
 
-![Schéma réseau global](Diagramme_sans_nom_1.drawio.png)
+<img src="Diagramme_sans_nom_1.drawio.png" alt="Schéma réseau global" width="100%">
 
 *Vue d'ensemble de l'interconnexion entre le siège de Genève (On-Premises), la filiale Paris (LAN distant) et le Cloud Public AWS, via la DMZ/VPN VLAN 99.*
 
@@ -36,7 +36,7 @@ Ce projet documente la conception et la mise en œuvre de leur nouvelle infrastr
 
 ### Diagramme des flux (SOC, SIEM, SaaS, E-commerce)
 
-![Diagramme des flux](Diagramme_sans_nom.drawio.png)
+<img src="Diagramme_sans_nom.drawio.png" alt="Diagramme des flux" width="100%">
 
 *Flux de données entre les terminaux, le pare-feu NGFW Palo Alto, les plateformes SaaS/E-commerce, et la centralisation des logs dans Splunk (SIEM) pour supervision par l'équipe SOC.*
 
@@ -52,18 +52,6 @@ Ce projet documente la conception et la mise en œuvre de leur nouvelle infrastr
 
 ---
 
-## 🛠️ Stack technique
-
-| Domaine          | Solution                                          |
-|------------------|---------------------------------------------------|
-| Réseau           | Palo Alto NGFW, SD-WAN, Zero Trust / ZTNA         |
-| Cloud            | AWS (EKS, EC2, RDS)                               |
-| IaC              | Terraform + Ansible                               |
-| Sécurité         | CrowdStrike Falcon (EDR), Palo Alto Cortex (XDR), Splunk (SIEM) |
-| Virtualisation   | VMware vSphere, Kubernetes                        |
-
----
-
 ## 👥 Équipe
 
 | Membre   | Rôle                                  |
@@ -72,13 +60,3 @@ Ce projet documente la conception et la mise en œuvre de leur nouvelle infrastr
 | Ugo      | Infrastructure réseau                 |
 | Praveen  | Administration équipements utilisateurs |
 | Hugo     | DevOps & Automatisation               |
-
----
-
-## 📅 Livrables
-
-| Livrable   | Description                                    | Périmètre |
-|------------|------------------------------------------------|-----------|
-| Rendu 1    | Architecture réseau & choix techniques         | Groupe    |
-| Rendu 2    | Retour d'expérience individuel (REX)           | Individuel |
-| Rendu 3    | IaC (Terraform + Ansible) + documentation technique | Groupe |
