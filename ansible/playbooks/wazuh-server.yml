@@ -1,0 +1,22 @@
+---
+- name: Déploiement du serveur Wazuh (All-in-One)
+  hosts: soc
+  become: yes
+  tasks:
+    - name: Télécharger le script d'installation officiel de Wazuh
+      ansible.builtin.get_url:
+        url: https://packages.wazuh.com/4.14/wazuh-install.sh
+        dest: /tmp/wazuh-install.sh
+        mode: '0700'
+
+    - name: Exécuter l'installation automatique (15-20 minutes)
+      ansible.builtin.command:
+        cmd: bash /tmp/wazuh-install.sh -a
+      args:
+        creates: /var/ossec/etc/ossec.conf
+      register: wazuh_install_output
+
+    - name: Afficher les identifiants générés
+      ansible.builtin.debug:
+        var: wazuh_install_output.stdout_lines
+      when: wazuh_install_output.changed
