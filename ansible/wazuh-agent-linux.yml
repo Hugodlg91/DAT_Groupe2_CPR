@@ -1,0 +1,55 @@
+---
+- name: Déploiement agent Wazuh sur serveurs Linux
+  hosts: dmz
+  gather_facts: false
+
+  vars:
+    wazuh_manager: "10.0.2.20"
+    wazuh_version: "4.14.5"
+
+  tasks:
+
+    - name: Ajouter la clé GPG Wazuh
+      ansible.builtin.shell: |
+        curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --dearmor -o /usr/share/keyrings/wazuh.gpg
+      args:
+        creates: /usr/share/keyrings/wazuh.gpg
+
+    - name: Ajouter le dépôt Wazuh
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/wazuh.list
+        content: "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main\n"
+        mode: '0644'
+
+    - name: Mettre à jour le cache APT
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Installer l'agent Wazuh
+      ansible.builtin.apt:
+        name: wazuh-agent={{ wazuh_version }}-1
+        state: present
+      environment:
+        WAZUH_MANAGER: "{{ wazuh_manager }}"
+        WAZUH_AGENT_NAME: "{{ inventory_hostname }}"
+
+    - name: Corriger l'IP manager si 0.0.0.0
+      ansible.builtin.replace:
+        path: /var/ossec/etc/ossec.conf
+        regexp: '<address>0\.0\.0\.0</address>'
+        replace: '<address>{{ wazuh_manager }}</address>'
+
+    - name: Activer et démarrer le service Wazuh
+      ansible.builtin.systemd:
+        name: wazuh-agent
+        enabled: true
+        state: started
+
+    - name: Vérifier la connexion au manager
+      ansible.builtin.shell: grep "Connected to the server" /var/ossec/logs/ossec.log | tail -1
+      register: wazuh_status
+      changed_when: false
+
+    - name: Afficher le statut
+      ansible.builtin.debug:
+        msg: "{{ wazuh_status.stdout }}"
