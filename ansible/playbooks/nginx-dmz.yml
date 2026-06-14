@@ -1,0 +1,42 @@
+---
+- name: Déploiement nginx sur SRV-DMZ
+  hosts: dmz
+  gather_facts: false
+
+  tasks:
+
+    - name: Mettre à jour le cache APT
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Installer nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Activer et démarrer nginx
+      ansible.builtin.systemd:
+        name: nginx
+        enabled: true
+        state: started
+
+    - name: Déployer la page vitrine CYNA
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../scripts/linux/index.html"
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+      notify: Recharger nginx
+
+    - name: Vérifier que nginx répond
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}"
+        status_code: 200
+      delegate_to: localhost
+
+  handlers:
+    - name: Recharger nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
