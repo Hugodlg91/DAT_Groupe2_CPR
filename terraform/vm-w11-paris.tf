@@ -1,7 +1,7 @@
-resource "proxmox_virtual_environment_vm" "clt_w11" {
+resource "proxmox_virtual_environment_vm" "clt_w11_paris" {
   node_name = "pve"
-  name      = "CLT-W11"
-  vm_id     = 103
+  name      = "CLT-W11-PARIS"
+  vm_id     = 104
 
   bios            = "ovmf"
   machine         = "q35"
@@ -15,7 +15,7 @@ resource "proxmox_virtual_environment_vm" "clt_w11" {
   }
 
   memory {
-    dedicated = 8192
+    dedicated = 10560
   }
 
   efi_disk {
@@ -34,15 +34,15 @@ resource "proxmox_virtual_environment_vm" "clt_w11" {
 
   cdrom {
     file_id   = "local:iso/virtio-win.iso"
-    interface = "ide1"
+    interface = "ide2"
   }
 
   network_device {
-    bridge      = "vmbr1"
+    bridge      = "vmbr3"
     model       = "virtio"
-    mac_address = "BC:24:11:D9:83:DD"
+    mac_address = "BC:24:11:21:ED:61"
   }
 
-  boot_order = ["virtio0", "ide1"]
+  boot_order = ["virtio0", "ide2"]
   started    = true
 }

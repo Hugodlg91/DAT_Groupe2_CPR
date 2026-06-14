@@ -3,18 +3,18 @@ resource "proxmox_virtual_environment_vm" "srv_wazuh" {
   name      = "SRV-WAZUH"
   vm_id     = 102
 
+  bios            = "seabios"
+  keyboard_layout = "fr"
+  on_boot         = true
+
   cpu {
-    cores = 4
-    type  = "x86-64-v2-AES"
+    cores   = 4
+    sockets = 1
+    type    = "x86-64-v2-AES"
   }
 
   memory {
     dedicated = 8192
-  }
-
-  cdrom {
-    file_id   = "local:iso/ubuntu-26.04-live-server-amd64.iso"
-    interface = "ide0"
   }
 
   disk {
@@ -22,13 +22,15 @@ resource "proxmox_virtual_environment_vm" "srv_wazuh" {
     size         = 80
     interface    = "virtio0"
     discard      = "on"
+    aio          = "io_uring"
   }
 
   network_device {
-    bridge = "vmbr2"
-    model  = "virtio"
+    bridge      = "vmbr2"
+    model       = "virtio"
+    mac_address = "BC:24:11:10:8A:E4"
   }
 
-  boot_order = ["ide0", "virtio0"]
-  started    = false
+  boot_order = ["virtio0"]
+  started    = true
 }

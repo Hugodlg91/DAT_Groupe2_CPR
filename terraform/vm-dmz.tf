@@ -1,41 +1,36 @@
-resource "proxmox_virtual_environment_vm" "srv_ad01" {
+resource "proxmox_virtual_environment_vm" "srv_dmz" {
   node_name = "pve"
-  name      = "SRV-AD01"
-  vm_id     = 101
+  name      = "SRV-DMZ"
+  vm_id     = 105
 
   bios            = "seabios"
   keyboard_layout = "fr"
   on_boot         = true
 
   cpu {
-    cores   = 4
+    cores   = 1
     sockets = 1
     type    = "x86-64-v2-AES"
   }
 
   memory {
-    dedicated = 10528
+    dedicated = 1024
   }
 
   disk {
     datastore_id = "local-lvm"
-    size         = 60
+    size         = 20
     interface    = "virtio0"
     discard      = "on"
     aio          = "io_uring"
   }
 
-  cdrom {
-    file_id   = "local:iso/virtio-win.iso"
-    interface = "ide1"
-  }
-
   network_device {
-    bridge      = "vmbr2"
+    bridge      = "vmbr4"
     model       = "virtio"
-    mac_address = "BC:24:11:19:1A:38"
+    mac_address = "BC:24:11:28:22:90"
   }
 
-  boot_order = ["virtio0", "ide1"]
+  boot_order = ["virtio0"]
   started    = true
 }
