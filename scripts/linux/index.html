@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CYNA — Cybersecurity Network Analytics. Security Operations Center : détection des menaces, réponse aux incidents et audit de sécurité 24/7.">
+<title>CYNA — Cybersecurity Network Analytics</title>
+<style>
+  /* ============================================================
+     VARIABLES & RESET
+  ============================================================ */
+  :root {
+    --bg: #0a0a1a;
+    --bg-soft: #10102a;
+    --bg-card: #14142e;
+    --cyan: #00d4ff;
+    --purple: #7b2fff;
+    --text: #ffffff;
+    --text-dim: #a0a3c0;
+    --border: rgba(123, 47, 255, 0.18);
+    --gradient: linear-gradient(120deg, #00d4ff 0%, #7b2fff 100%);
+    --glow-cyan: rgba(0, 212, 255, 0.35);
+    --glow-purple: rgba(123, 47, 255, 0.35);
+    --radius: 16px;
+    --maxw: 1180px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Décor de fond global : halos lumineux fixes */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(620px circle at 12% 8%, rgba(0, 212, 255, 0.10), transparent 60%),
+      radial-gradient(680px circle at 88% 18%, rgba(123, 47, 255, 0.12), transparent 60%),
+      radial-gradient(700px circle at 50% 100%, rgba(123, 47, 255, 0.08), transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ul { list-style: none; }
+
+  .container {
+    width: 100%;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .accent {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ============================================================
+     NAVBAR
+  ============================================================ */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease;
+    border-bottom: 1px solid transparent;
+  }
+  header.scrolled {
+    background: rgba(10, 10, 26, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 74px;
+  }
+
+  .brand { display: flex; flex-direction: column; line-height: 1; }
+  .brand .name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 6px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .brand .tag {
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .nav-links { display: flex; gap: 38px; align-items: center; }
+  .nav-links a {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    position: relative;
+    transition: color 0.25s ease;
+    padding: 4px 0;
+  }
+  .nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -3px;
+    width: 0; height: 2px;
+    background: var(--gradient);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none; border: none; cursor: pointer;
+    padding: 6px;
+  }
+  .burger span {
+    width: 26px; height: 2px;
+    background: var(--text);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ============================================================
+     BOUTONS
+  ============================================================ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    border: none;
+    background: var(--gradient);
+    color: #06061a;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.25);
+  }
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 44px rgba(123, 47, 255, 0.45);
+  }
+  .btn .arrow { transition: transform 0.25s ease; }
+  .btn:hover .arrow { transform: translateX(5px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .btn-ghost:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.2);
+  }
+
+  /* ============================================================
+     HERO
+  ============================================================ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  /* grille animée */
+  .hero .grid-bg {
+    position: absolute;
+    inset: -50% 0 0 0;
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(123, 47, 255, 0.06) 1px, transparent 1px);
+    background-size: 54px 54px;
+    transform: perspective(420px) rotateX(58deg);
+    transform-origin: top center;
+    animation: gridmove 18s linear infinite;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 75%);
+  }
+  @keyframes gridmove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 54px; }
+  }
+  /* blobs flottants */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.5;
+    z-index: 0;
+  }
+  .blob.b1 { width: 420px; height: 420px; background: var(--cyan); top: -80px; right: -60px; animation: float 12s ease-in-out infinite; }
+  .blob.b2 { width: 380px; height: 380px; background: var(--purple); bottom: -100px; left: -80px; animation: float 15s ease-in-out infinite reverse; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, 40px); }
+  }
+
+  .hero-content { max-width: 820px; position: relative; z-index: 2; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 18px;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    background: rgba(20, 20, 46, 0.6);
+    margin-bottom: 28px;
+  }
+  .pill .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: #2bff88;
+    box-shadow: 0 0 0 0 rgba(43, 255, 136, 0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(43, 255, 136, 0.6); }
+    70% { box-shadow: 0 0 0 12px rgba(43, 255, 136, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(43, 255, 136, 0); }
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+  .hero p.sub {
+    font-size: clamp(1rem, 2.2vw, 1.28rem);
+    color: var(--text-dim);
+    max-width: 620px;
+    margin-bottom: 40px;
+  }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+
+  /* ============================================================
+     SECTIONS GÉNÉRIQUES
+  ============================================================ */
+  section { padding: 110px 0; position: relative; }
+  .section-head { text-align: center; max-width: 640px; margin: 0 auto 64px; }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 14px;
+  }
+  .section-head h2 {
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .section-head p { color: var(--text-dim); font-size: 1.05rem; }
+
+  /* ============================================================
+     SERVICES
+  ============================================================ */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 38px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(0, 212, 255, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 212, 255, 0.15);
+  }
+  .card:hover::before { transform: scaleX(1); }
+
+  .icon-box {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    transition: transform 0.35s ease;
+  }
+  .card:hover .icon-box { transform: scale(1.08) rotate(-4deg); }
+  .icon-box svg { width: 30px; height: 30px; stroke: var(--cyan); }
+
+  .card h3 { font-size: 1.32rem; margin-bottom: 12px; font-weight: 700; }
+  .card p { color: var(--text-dim); font-size: 0.97rem; margin-bottom: 20px; }
+  .card ul li {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .card ul li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gradient);
+  }
+
+  /* ============================================================
+     SOC
+  ============================================================ */
+  #soc { background: var(--bg-soft); }
+  .soc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .soc-text .eyebrow { text-align: left; }
+  .soc-text h2 {
+    font-size: clamp(1.9rem, 4vw, 2.7rem);
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+  .soc-text > p { color: var(--text-dim); margin-bottom: 30px; font-size: 1.05rem; }
+  .soc-features { display: grid; gap: 18px; }
+  .soc-feature {
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .soc-feature .chk {
+    flex-shrink: 0;
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: rgba(123, 47, 255, 0.12);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .soc-feature .chk svg { width: 18px; height: 18px; stroke: var(--cyan); }
+  .soc-feature h4 { font-size: 1.02rem; margin-bottom: 2px; }
+  .soc-feature p { color: var(--text-dim); font-size: 0.9rem; }
+
+  /* moniteur / terminal SOC */
+  .monitor {
+    background: #07071a;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 212, 255, 0.08);
+  }
+  .monitor-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 18px;
+    background: rgba(123, 47, 255, 0.08);
+    border-bottom: 1px solid var(--border);
+  }
+  .monitor-bar .dots { display: flex; gap: 7px; }
+  .monitor-bar .dots i {
+    width: 12px; height: 12px; border-radius: 50%; display: inline-block;
+  }
+  .monitor-bar .dots i:nth-child(1) { background: #ff5f57; }
+  .monitor-bar .dots i:nth-child(2) { background: #febc2e; }
+  .monitor-bar .dots i:nth-child(3) { background: #28c840; }
+  .monitor-bar .title {
+    font-size: 0.8rem; color: var(--text-dim);
+    margin-left: 10px; letter-spacing: 1px;
+    font-family: "Courier New", monospace;
+  }
+  .monitor-bar .live {
+    margin-left: auto; display: flex; align-items: center; gap: 7px;
+    font-size: 0.72rem; color: #2bff88; letter-spacing: 1px;
+  }
+  .monitor-bar .live .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #2bff88;
+    animation: pulse 2s infinite;
+  }
+  .monitor-body {
+    padding: 18px;
+    height: 320px;
+    overflow: hidden;
+    font-family: "Courier New", Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.9;
+  }
+  .log-line { display: flex; gap: 10px; animation: logIn 0.4s ease; }
+  @keyframes logIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+  .log-line .ts { color: #5a5d80; flex-shrink: 0; }
+  .log-line .lvl { flex-shrink: 0; font-weight: 700; width: 64px; }
+  .log-line .lvl.ok { color: #2bff88; }
+  .log-line .lvl.warn { color: #febc2e; }
+  .log-line .lvl.crit { color: #ff5f57; }
+  .log-line .lvl.info { color: var(--cyan); }
+  .log-line .msg { color: var(--text-dim); }
+
+  /* ============================================================
+     STATS
+  ============================================================ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .stat {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .stat:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 0 40px rgba(123, 47, 255, 0.2);
+  }
+  .stat .num {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .stat .label {
+    margin-top: 12px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================================
+     CONTACT
+  ============================================================ */
+  #contact { background: var(--bg-soft); }
+  .contact-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .contact-info h2 {
+    font-size: clamp(1.9rem, 4vw, 2.7rem);
+    font-weight: 800; margin-bottom: 18px; letter-spacing: -0.5px;
+  }
+  .contact-info > p { color: var(--text-dim); margin-bottom: 30px; font-size: 1.05rem; }
+  .contact-info .line { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .contact-info .line svg { width: 22px; height: 22px; stroke: var(--cyan); flex-shrink: 0; }
+  .contact-info .line span { color: var(--text-dim); }
+
+  form {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 34px;
+  }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 0.88rem; margin-bottom: 8px; color: var(--text-dim); }
+  .field input, .field textarea {
+    width: 100%;
+    background: #0c0c22;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 15px;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.12);
+  }
+  .field textarea { resize: vertical; min-height: 110px; }
+  form .btn { width: 100%; justify-content: center; }
+  .form-note { text-align: center; font-size: 0.85rem; color: #2bff88; margin-top: 16px; min-height: 20px; }
+
+  /* ============================================================
+     FOOTER
+  ============================================================ */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 56px 0 30px;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .footer-brand { max-width: 320px; }
+  .footer-brand .name {
+    font-size: 1.4rem; font-weight: 800; letter-spacing: 5px;
+    background: var(--gradient);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .footer-brand p { color: var(--text-dim); font-size: 0.9rem; margin-top: 12px; }
+  .footer-cols { display: flex; gap: 60px; flex-wrap: wrap; }
+  .footer-col h5 { font-size: 0.95rem; margin-bottom: 16px; }
+  .footer-col a { display: block; color: var(--text-dim); font-size: 0.88rem; margin-bottom: 10px; transition: color 0.2s ease; }
+  .footer-col a:hover { color: var(--cyan); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 26px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    color: var(--text-dim); font-size: 0.82rem;
+  }
+  .footer-bottom .legal a { color: var(--text-dim); margin-left: 18px; transition: color 0.2s ease; }
+  .footer-bottom .legal a:hover { color: var(--cyan); }
+
+  /* ============================================================
+     ANIMATIONS AU SCROLL
+  ============================================================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: 0.1s; }
+  .reveal.d2 { transition-delay: 0.2s; }
+  .reveal.d3 { transition-delay: 0.3s; }
+
+  /* ============================================================
+     RESPONSIVE
+  ============================================================ */
+  @media (max-width: 900px) {
+    .soc-grid, .contact-wrap { grid-template-columns: 1fr; }
+    .cards { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .nav-links {
+      position: fixed;
+      top: 74px; left: 0; right: 0;
+      flex-direction: column;
+      gap: 0;
+      background: rgba(10, 10, 26, 0.97);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0 20px;
+      transform: translateY(-130%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .nav-links.open { transform: translateY(0); }
+    .nav-links a { padding: 14px 24px; width: 100%; }
+    .nav-links a::after { display: none; }
+    .burger { display: flex; }
+    section { padding: 80px 0; }
+    .cards { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; }
+  }
+
+  /* Accessibilité : réduction des animations */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============================ NAVBAR ============================ -->
+  <header id="header">
+    <div class="container nav">
+      <a href="#accueil" class="brand" aria-label="CYNA accueil">
+        <span class="name">CYNA</span>
+        <span class="tag">Security Operations Center</span>
+      </a>
+      <nav>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#accueil">Accueil</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#soc">SOC</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================ HERO ============================ -->
+  <section class="hero" id="accueil">
+    <div class="grid-bg"></div>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="container">
+      <div class="hero-content">
+        <span class="pill"><span class="dot"></span> SOC opérationnel — surveillance active 24/7</span>
+        <h1>La <span class="accent">cybersécurité</span> qui ne dort jamais.</h1>
+        <p class="sub">
+          CYNA — Cybersecurity Network Analytics protège votre infrastructure grâce à
+          une détection des menaces en temps réel, une réponse aux incidents immédiate
+          et des audits de sécurité pilotés par nos experts.
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn">Demander une démo <span class="arrow">&rarr;</span></a>
+          <a href="#services" class="btn btn-ghost">Découvrir nos services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SERVICES ============================ -->
+  <section id="services">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Nos Services</div>
+        <h2>Une protection sur toute la chaîne</h2>
+        <p>De la détection à la remédiation, nous couvrons l'ensemble de votre cycle de défense.</p>
+      </div>
+      <div class="cards">
+
+        <article class="card reveal d1">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 4 5v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>Threat Detection</h3>
+          <p>Détection des menaces en temps réel grâce à l'analyse comportementale et au renseignement sur les menaces.</p>
+          <ul>
+            <li>Surveillance réseau continue</li>
+            <li>Corrélation d'événements SIEM</li>
+            <li>Détection des anomalies par IA</li>
+          </ul>
+        </article>
+
+        <article class="card reveal d2">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>
+            </svg>
+          </div>
+          <h3>Incident Response</h3>
+          <p>Réponse aux incidents en quelques minutes pour contenir, éradiquer et restaurer vos systèmes critiques.</p>
+          <ul>
+            <li>Confinement immédiat</li>
+            <li>Analyse forensique</li>
+            <li>Plan de remédiation</li>
+          </ul>
+        </article>
+
+        <article class="card reveal d3">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m21 21-4.3-4.3"/>
+              <path d="M11 8v3l2 1"/>
+            </svg>
+          </div>
+          <h3>Security Audit</h3>
+          <p>Audits de sécurité et tests d'intrusion pour identifier vos vulnérabilités avant les attaquants.</p>
+          <ul>
+            <li>Tests d'intrusion (pentest)</li>
+            <li>Audit de conformité</li>
+            <li>Évaluation des risques</li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ SOC ============================ -->
+  <section id="soc">
+    <div class="container">
+      <div class="soc-grid">
+
+        <div class="soc-text reveal">
+          <div class="eyebrow">Security Operations Center</div>
+          <h2>Votre tour de contrôle <span class="accent">cyber</span></h2>
+          <p>
+            Nos analystes pilotent votre sécurité depuis un centre opérationnel actif
+            en permanence. Chaque alerte est triée, qualifiée et traitée par des experts
+            certifiés, pour une visibilité totale sur votre exposition.
+          </p>
+          <div class="soc-features">
+            <div class="soc-feature">
+              <span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11-5-5"/></svg></span>
+              <div><h4>Surveillance 24/7/365</h4><p>Des yeux sur votre réseau à chaque seconde, jour et nuit.</p></div>
+            </div>
+            <div class="soc-feature">
+              <span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11-5-5"/></svg></span>
+              <div><h4>Threat Intelligence</h4><p>Renseignement sur les menaces mis à jour en continu.</p></div>
+            </div>
+            <div class="soc-feature">
+              <span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11-5-5"/></svg></span>
+              <div><h4>Temps de réponse < 15 min</h4><p>Escalade immédiate dès qu'un incident critique survient.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="monitor reveal d2">
+          <div class="monitor-bar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="title">cyna-soc — flux en direct</span>
+            <span class="live"><span class="dot"></span> LIVE</span>
+          </div>
+          <div class="monitor-body" id="monitor"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ STATS ============================ -->
+  <section id="stats">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">CYNA en chiffres</div>
+        <h2>La confiance, mesurée</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat reveal d1">
+          <div class="num" data-target="200" data-suffix="+">0</div>
+          <div class="label">Collaborateurs</div>
+        </div>
+        <div class="stat reveal d1">
+          <div class="num" data-static="24/7">24/7</div>
+          <div class="label">SOC actif</div>
+        </div>
+        <div class="stat reveal d2">
+          <div class="num" data-target="99.9" data-decimals="1" data-suffix="%">0</div>
+          <div class="label">Disponibilité</div>
+        </div>
+        <div class="stat reveal d2">
+          <div class="num" data-target="0" data-suffix="">0</div>
+          <div class="label">Faille de sécurité</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ CONTACT ============================ -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-wrap">
+
+        <div class="contact-info reveal">
+          <div class="eyebrow">Contact</div>
+          <h2>Parlons de votre sécurité</h2>
+          <p>Un expert CYNA vous recontacte sous 24 heures pour évaluer vos besoins et planifier une démonstration.</p>
+          <div class="line">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>
+            <span>contact@cyna-security.fr</span>
+          </div>
+          <div class="line">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+            <span>+33 1 86 65 00 00</span>
+          </div>
+          <div class="line">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>12 rue de la Cyberdéfense, 75008 Paris</span>
+          </div>
+        </div>
+
+        <form id="contactForm" novalidate>
+          <div class="field">
+            <label for="name">Nom complet</label>
+            <input type="text" id="name" name="name" placeholder="Jean Dupont" required>
+          </div>
+          <div class="field">
+            <label for="email">Email professionnel</label>
+            <input type="email" id="email" name="email" placeholder="jean.dupont@entreprise.fr" required>
+          </div>
+          <div class="field">
+            <label for="message">Votre message</label>
+            <textarea id="message" name="message" placeholder="Décrivez votre besoin en cybersécurité..." required></textarea>
+          </div>
+          <button type="submit" class="btn">Envoyer la demande <span class="arrow">&rarr;</span></button>
+          <div class="form-note" id="formNote"></div>
+        </form>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer>
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="name">CYNA</div>
+          <p>Cybersecurity Network Analytics — Security Operations Center. La défense proactive de votre infrastructure numérique.</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h5>Services</h5>
+            <a href="#services">Threat Detection</a>
+            <a href="#services">Incident Response</a>
+            <a href="#services">Security Audit</a>
+            <a href="#soc">SOC managé</a>
+          </div>
+          <div class="footer-col">
+            <h5>Entreprise</h5>
+            <a href="#accueil">À propos</a>
+            <a href="#soc">Notre SOC</a>
+            <a href="#contact">Contact</a>
+            <a href="#contact">Carrières</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>CYNA &copy; 2026 — Tous droits réservés. SAS au capital de 250 000 € — RCS Paris 912 345 678.</div>
+        <div class="legal">
+          <a href="#">Mentions légales</a>
+          <a href="#">Politique de confidentialité</a>
+          <a href="#">CGU</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  /* ============================================================
+     1. Navbar : fond au scroll
+  ============================================================ */
+  const header = document.getElementById('header');
+  const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 30);
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+
+  /* ============================================================
+     2. Menu mobile (burger)
+  ============================================================ */
+  const burger = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+  }));
+
+  /* ============================================================
+     3. Apparition au scroll (IntersectionObserver)
+  ============================================================ */
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  /* ============================================================
+     4. Compteurs animés (stats)
+  ============================================================ */
+  const counters = document.querySelectorAll('.num[data-target]');
+  const animateCount = (el) => {
+    const target = parseFloat(el.dataset.target);
+    const decimals = parseInt(el.dataset.decimals || '0', 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1600;
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      const val = (target * eased).toFixed(decimals);
+      el.textContent = val + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target.toFixed(decimals) + suffix;
+    };
+    requestAnimationFrame(step);
+  };
+  const statObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { animateCount(e.target); statObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.6 });
+  counters.forEach(c => statObs.observe(c));
+
+  /* ============================================================
+     5. Flux SOC simulé (terminal en direct)
+  ============================================================ */
+  const monitor = document.getElementById('monitor');
+  const events = [
+    ['info', 'Scan de vulnérabilités terminé — périmètre cloud'],
+    ['ok',   'Pare-feu : 1 248 connexions analysées, 0 anomalie'],
+    ['warn', 'Tentative de connexion suspecte bloquée (IP 185.x.x.x)'],
+    ['ok',   'Signature antivirus mise à jour — base v2026.06'],
+    ['info', 'Corrélation SIEM : agrégation de 42 événements'],
+    ['crit', 'Attaque par force brute détectée — source isolée'],
+    ['ok',   'Sauvegarde chiffrée validée — intégrité confirmée'],
+    ['warn', 'Certificat TLS expire dans 14 jours — alerte émise'],
+    ['ok',   'Endpoint 0042 conforme — politique appliquée'],
+    ['info', 'Renseignement menaces : 17 nouveaux IOC importés'],
+    ['ok',   'Trafic chiffré inspecté — aucune exfiltration'],
+    ['crit', 'Tentative d\'injection SQL neutralisée par le WAF'],
+    ['ok',   'Authentification MFA : 312 sessions vérifiées'],
+    ['info', 'Patch de sécurité déployé sur 86 machines']
+  ];
+  const pad = n => String(n).padStart(2, '0');
+  const timeStr = () => {
+    const d = new Date();
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  };
+  let evtIdx = 0;
+  const lvlLabel = { ok: 'OK', warn: 'WARN', crit: 'CRIT', info: 'INFO' };
+  const pushLog = () => {
+    const [lvl, msg] = events[evtIdx % events.length];
+    evtIdx++;
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.innerHTML =
+      '<span class="ts">' + timeStr() + '</span>' +
+      '<span class="lvl ' + lvl + '">' + lvlLabel[lvl] + '</span>' +
+      '<span class="msg">' + msg + '</span>';
+    monitor.appendChild(line);
+    // garder le terminal propre
+    while (monitor.children.length > 9) monitor.removeChild(monitor.firstChild);
+  };
+  // amorçage + boucle
+  for (let i = 0; i < 6; i++) pushLog();
+  setInterval(pushLog, 2200);
+
+  /* ============================================================
+     6. Formulaire de contact (fictif, sans backend)
+  ============================================================ */
+  const form = document.getElementById('contactForm');
+  const note = document.getElementById('formNote');
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+    if (!name || !email || !message) {
+      note.style.color = '#ff5f57';
+      note.textContent = 'Merci de remplir tous les champs.';
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      note.style.color = '#ff5f57';
+      note.textContent = 'Adresse email invalide.';
+      return;
+    }
+    note.style.color = '#2bff88';
+    note.textContent = 'Merci ' + name + ' ! Votre demande a bien été enregistrée.';
+    form.reset();
+  });
+
+  /* ============================================================
+     7. Année dynamique (sécurité d'affichage)
+  ============================================================ */
+  // (Le pied de page affiche 2026 ; on le garde figé selon la charte.)
+</script>
+</body>
+</html>
+
