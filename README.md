@@ -1,6 +1,6 @@
 # Projet CYNA — Infrastructure Cybersécurité Hybride
 
-> **Projet Fil Rouge** — CPI SRC 2025-2026 — Ingetis / CFA ITIS — Groupe 2
+> **Projet Fil Rouge** — CPI SRC 2025-2026 — Ingetis / CFA ITIS — Groupe 1
 > Dossier d'Architecture Technique (DAT) et fichiers de configuration de l'infrastructure CYNA.
 
 CYNA est une entreprise fictive de cybersécurité (~200 collaborateurs, SOC) répartie sur deux sites (Genève et Paris). Ce dépôt regroupe la documentation d'architecture et l'ensemble des fichiers de configuration permettant de comprendre et reproduire l'infrastructure déployée.
@@ -66,7 +66,7 @@ L'infrastructure repose sur un hyperviseur **Proxmox VE** segmenté en VLAN, ave
 ## Structure du dépôt
 
 ```
-DAT_Groupe2_CPR/
+DAT_Groupe1_CPR/
 ├── DAT_CYBER_CYNA.docx          # Dossier d'Architecture Technique
 ├── README.md                    # Ce fichier
 ├── .gitignore                   # Exclusion des fichiers sensibles
