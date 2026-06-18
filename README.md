@@ -23,8 +23,6 @@ CYNA est une entreprise fictive de cybersécurité (~200 collaborateurs, SOC) r�
 
 ![Schéma de l'architecture réseau CYNA](config/schemas/architecture-reseau.png)
 
-> _Schéma à insérer : `config/schemas/architecture-reseau.png` (export draw.io)._
-
 L'infrastructure repose sur un hyperviseur **Proxmox VE** segmenté en VLAN, avec un pare-feu **OPNsense** assurant le routage inter-VLAN, le filtrage, le DHCP (Kea) et le DNS (Unbound).
 
 ### Plan d'adressage
