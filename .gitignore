@@ -1,0 +1,57 @@
+# ===================================================================
+# .gitignore — Repo DAT CYNA (PUBLIC)
+# Bloque les fichiers contenant des secrets, même si l'accès Proxmox
+# est protégé par Tailscale. Ces fichiers ne doivent jamais être publics.
+# ===================================================================
+
+# --- Clés SSH privées (JAMAIS dans un repo) ---
+*.pem
+*_key
+*_key.*
+id_rsa
+id_ed25519
+dmz_key
+tofu_key
+.ssh/
+
+# --- Terraform / OpenTofu : état + variables secrètes ---
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.auto.tfvars
+override.tf
+override.tf.json
+
+# --- Ansible Vault : mot de passe (les group_vars chiffrés, eux, sont OK) ---
+.vault_pass
+.vault_pass.txt
+vault-password*
+*.vault-pass
+
+# --- OPNsense : export de conf brut (contient hash, clés API, seeds TOTP, certs) ---
+# Ne committer qu'une version SANITISÉE manuellement (config.sanitized.xml)
+config.xml
+*config-backup*.xml
+
+# --- Certificats / clés privées ---
+*.key
+*.crt
+*.p12
+*.pfx
+
+# --- Secrets divers ---
+.env
+.env.*
+*secret*
+*password*
+*credentials*
+
+# --- Logs et fichiers temporaires ---
+*.log
+*.tmp
+*.bak
+__pycache__/
+.DS_Store
