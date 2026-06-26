@@ -72,14 +72,11 @@ DAT_Groupe1_CPR/
 ├── .gitignore                   # Exclusion des fichiers sensibles
 └── config/
     ├── schemas/                 # Schémas réseau (draw.io / PNG)
-    ├── opnsense/                # Config OPNsense (SANITISÉE — sans secrets)
+    ├── exports_serveurs         # Exports des configs serveurs (OPNSense, Zabbix, GPO, Wazuh)
     ├── terraform/               # Fichiers .tf (IaC Proxmox)
     ├── ansible/                 # Playbooks, inventaire, group_vars (Vault)
-    ├── wazuh/                   # Règles custom (local_rules.xml), ossec.conf
-    ├── zabbix/                  # zabbix_agent2.conf
     ├── nginx/                   # Config + site vitrine
-    ├── scripts/                 # Scripts PowerShell (déploiement agents)
-    └── netplan/                 # Configuration réseau des serveurs Linux
+    └── scripts/                 # Scripts PowerShell (déploiement agents)
 ```
 
 ---
